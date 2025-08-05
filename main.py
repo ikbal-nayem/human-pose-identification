@@ -1,5 +1,6 @@
 import cv2
 import mediapipe as mp
+import keyboard
 
 # Initialize MediaPipe Hands
 mp_hands = mp.solutions.hands
@@ -42,6 +43,7 @@ while cap.isOpened():
             # Determine fist state
             if avg_distance < 0.2:  # Threshold for reliable fist detection
                 state = "Fist Closed"
+                keyboard.press_and_release('space')
                 color = (0, 0, 255)  # Red
             else:
                 state = "Fist Open"
