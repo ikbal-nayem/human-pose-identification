@@ -1,6 +1,8 @@
 import cv2
 import mediapipe as mp
-import keyboard
+from pynput.keyboard import Controller, Key
+
+keyboard_ctl = Controller()
 
 # Initialize MediaPipe Hands
 mp_hands = mp.solutions.hands
@@ -38,12 +40,13 @@ while cap.isOpened():
             distances = [((tip.x - wrist.x)**2 + (tip.y - wrist.y)**2)**0.5 for tip in tips]
             
             avg_distance = sum(distances) / len(distances)
-            print(f"Avg finger distance: {avg_distance:.3f}")
+            # print(f"Avg finger distance: {avg_distance:.3f}")
             
             # Determine fist state
             if avg_distance < 0.2:  # Threshold for reliable fist detection
                 state = "Fist Closed"
-                keyboard.press_and_release('space')
+                keyboard_ctl.press(Key.space)
+                keyboard_ctl.release(Key.space)
                 color = (0, 0, 255)  # Red
             else:
                 state = "Fist Open"
