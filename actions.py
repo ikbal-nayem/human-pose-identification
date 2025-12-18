@@ -38,4 +38,4 @@ def on_fist_closed(frame, hand_landmarks, label):
 
 def on_fist_open(frame, hand_landmarks, label):
     """Called when a fist is open."""
-    keyboard.release(label.lower())    
+    keyboard.release(label.lower())

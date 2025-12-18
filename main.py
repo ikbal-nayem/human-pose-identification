@@ -110,18 +110,17 @@ while cap.isOpened():
 
             # --- Gesture Recognition ---
             hand_label = hand_results.multi_handedness[i].classification[0].label
-            display_label = "Right" if hand_label == "Left" else "Left"
             if detect_fist(hand_landmarks, mp_hands):
                 gesture = "Fist Closed"
                 color = (0, 0, 255)
-                on_fist_closed(frame, hand_landmarks, display_label)
+                on_fist_closed(frame, hand_landmarks, hand_label)
             else:
                 gesture = "Fist Open"
                 color = (0, 255, 0)
-                on_fist_open(frame, hand_landmarks, display_label)
+                on_fist_open(frame, hand_landmarks, hand_label)
             # print(f"{display_label} Hand: {gesture}")
             # Draw hand status in small text near top-left/right corners
-            if display_label == "Left":
+            if hand_label == "Left":
                 cv2.putText(frame, f"Left: {gesture}", (10, 110),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 1, cv2.LINE_AA)
             else:  # Right
