@@ -91,13 +91,13 @@ while cap.isOpened():
         right_hand_up = right_wrist[1] < nose[1]
 
         if left_hand_up and right_hand_up:
-            cv2.putText(frame, "Both Hands Up", (50, 200), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2, cv2.LINE_AA)
+            cv2.putText(frame, "Both Hands Up", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), 1, cv2.LINE_AA)
         elif left_hand_up:
-            cv2.putText(frame, "Left Hand Up", (50, 200), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2, cv2.LINE_AA)
+            cv2.putText(frame, "Left Hand Up", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), 1, cv2.LINE_AA)
         elif right_hand_up:
-            cv2.putText(frame, "Right Hand Up", (50, 200), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2, cv2.LINE_AA)
+            cv2.putText(frame, "Right Hand Up", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), 1, cv2.LINE_AA)
         else:
-            cv2.putText(frame, "Hands Down", (50, 200), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2, cv2.LINE_AA)
+            cv2.putText(frame, "Hands Down", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), 1, cv2.LINE_AA)
 
 
         # --- Action Recognition ---
@@ -110,7 +110,7 @@ while cap.isOpened():
             elif is_jumping and prev_nose_y - nose[1] < -0.05:
                 is_jumping = False
                 print("Action: Jump")
-                cv2.putText(frame, "Action: Jump", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+                cv2.putText(frame, "Action: Jump", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 1, cv2.LINE_AA)
 
 
         prev_nose_y = nose[1]
@@ -125,9 +125,9 @@ while cap.isOpened():
         right_knee_angle = calculate_angle(right_hip, right_knee, [landmarks[mp_pose.PoseLandmark.RIGHT_ANKLE.value].x, landmarks[mp_pose.PoseLandmark.RIGHT_ANKLE.value].y])
 
         if left_knee_angle < 160 or right_knee_angle < 160:
-             # This is a very simplistic check. A real system would need to analyze the gait cycle.
+            # This is a very simplistic check. A real system would need to analyze the gait cycle.
             print("Action: Walking/Running")
-            cv2.putText(frame, "Action: Walking/Running", (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+            cv2.putText(frame, "Action: Walking/Running", (10, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 1, cv2.LINE_AA)
 
 
     if hand_results.multi_hand_landmarks:
@@ -137,6 +137,8 @@ while cap.isOpened():
 
             # --- Gesture Recognition ---
             hand_label = hand_results.multi_handedness[i].classification[0].label
+            # Since frame is flipped horizontally, swap the labels
+            display_label = "Right" if hand_label == "Left" else "Left"
             
             if is_fist_closed(hand_landmarks):
                 gesture = "Fist Closed"
@@ -145,16 +147,17 @@ while cap.isOpened():
                 gesture = "Fist Open"
                 color = (0, 255, 0)
             
-            print(f"{hand_label} Hand: {gesture}")
-            if hand_label == "Left":
+            print(f"{display_label} Hand: {gesture}")
+            if display_label == "Left":
                 cv2.putText(frame, f"Left Hand: {gesture}", (50, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, color, 2, cv2.LINE_AA)
             else: # Right
                 cv2.putText(frame, f"Right Hand: {gesture}", (400, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, color, 2, cv2.LINE_AA)
 
 
-    cv2.imshow('MediaPipe Feed', frame)
+    cv2.imshow('Game control', frame)
 
-    if cv2.waitKey(10) & 0xFF == ord('q'):
+    key = cv2.waitKey(1) & 0xFF
+    if key == ord('q') or key == 27:  # 27 is ESC key, for better Linux compatibility
         break
 
 cap.release()
