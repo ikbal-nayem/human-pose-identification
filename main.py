@@ -119,7 +119,7 @@ while cap.isOpened():
                 gesture = "Fist Open"
                 color = (0, 255, 0)
                 on_fist_open(frame, hand_landmarks, display_label)
-            print(f"{display_label} Hand: {gesture}")
+            # print(f"{display_label} Hand: {gesture}")
             # Draw hand status in small text near top-left/right corners
             if display_label == "Left":
                 cv2.putText(frame, f"Left: {gesture}", (10, 110),
