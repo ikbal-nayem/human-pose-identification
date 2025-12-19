@@ -127,7 +127,9 @@ while cap.isOpened():
                 cv2.putText(frame, f"Right: {gesture}", (300, 110),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 1, cv2.LINE_AA)
 
-    cv2.imshow('Game control', frame)
+    # cv2.namedWindow('Game controler', cv2.WINDOW_NORMAL)
+    # cv2.setWindowProperty('Game controler', cv2.WND_PROP_TOPMOST, 1)
+    cv2.imshow('Game controler', frame)
 
     key = cv2.waitKey(1) & 0xFF
     if key in (ord('q'), ord('Q'), 27):
