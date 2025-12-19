@@ -2,7 +2,17 @@ import cv2
 import mediapipe as mp
 
 from detect import detect_hands_up_down, detect_jump, detect_walk_run, detect_fist
-from actions import on_both_hands_up, on_left_hand_up, on_right_hand_up, on_hands_down, on_jump, on_walk_run, on_fist_closed, on_fist_open
+from actions import (
+    on_both_hands_up,
+    on_left_hand_up,
+    on_right_hand_up,
+    on_hands_down,
+    on_jump,
+    on_walk_run,
+    on_fist_closed,
+    on_fist_open,
+    release_all_buttons,
+)
 
 
 # Initialize MediaPipe Pose and Hands
@@ -126,6 +136,9 @@ while cap.isOpened():
             else:  # Right
                 cv2.putText(frame, f"Right: {gesture}", (300, 110),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 1, cv2.LINE_AA)
+    else:
+        # No hands detected: ensure all button keys are released
+        release_all_buttons()
 
     # cv2.namedWindow('Game controler', cv2.WINDOW_NORMAL)
     # cv2.setWindowProperty('Game controler', cv2.WND_PROP_TOPMOST, 1)

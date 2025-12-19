@@ -39,3 +39,16 @@ def on_fist_closed(frame, hand_landmarks, label):
 def on_fist_open(frame, hand_landmarks, label):
     """Called when a fist is open."""
     keyboard.release(label.lower())
+
+
+def release_all_buttons():
+    """Release all known button keys. Call this when no hands are detected."""
+    # Release both left/right keys (matches on_fist handlers which use label.lower())
+    try:
+        keyboard.release('left')
+    except Exception:
+        pass
+    try:
+        keyboard.release('right')
+    except Exception:
+        pass
