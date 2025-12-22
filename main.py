@@ -55,12 +55,12 @@ while cap.isOpened():
         landmarks = pose_results.pose_landmarks.landmark
 
         # Get coordinates
-        nose = [landmarks[mp_pose.PoseLandmark.NOSE.value].x,
-                landmarks[mp_pose.PoseLandmark.NOSE.value].y]
-        left_wrist = [landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].x,
-                      landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].y]
-        right_wrist = [landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].x,
-                       landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].y]
+        # nose = [landmarks[mp_pose.PoseLandmark.NOSE.value].x,
+        #         landmarks[mp_pose.PoseLandmark.NOSE.value].y]
+        # left_wrist = [landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].x,
+        #               landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].y]
+        # right_wrist = [landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].x,
+        #                landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].y]
 
         # --- Gesture Recognition ---
         # Hands up/down detection
@@ -85,13 +85,13 @@ while cap.isOpened():
         # --- Action Recognition ---
 
         # Jump detection
-        jump_action, is_jumping = detect_jump(prev_nose_y, nose[1], is_jumping)
-        if jump_action == "jump":
-            print("Action: Jump")
-            cv2.putText(frame, "Action: Jump", (10, 50),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 1, cv2.LINE_AA)
-            on_jump(frame, landmarks)
-        prev_nose_y = nose[1]
+        # jump_action, is_jumping = detect_jump(prev_nose_y, nose[1], is_jumping)
+        # if jump_action == "jump":
+        #     print("Action: Jump")
+        #     cv2.putText(frame, "Action: Jump", (10, 50),
+        #                 cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 1, cv2.LINE_AA)
+        #     on_jump(frame, landmarks)
+        # prev_nose_y = nose[1]
 
         # Walk/Run detection (very basic)
 
