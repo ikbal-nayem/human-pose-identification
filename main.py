@@ -49,8 +49,8 @@ while cap.isOpened():
     # Draw the pose annotation on the image.
     frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
     if pose_results.pose_landmarks:
-        mp_drawing.draw_landmarks(
-            frame, pose_results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
+        # mp_drawing.draw_landmarks(
+        #     frame, pose_results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
 
         landmarks = pose_results.pose_landmarks.landmark
 
@@ -137,15 +137,12 @@ while cap.isOpened():
                 cv2.putText(frame, f"Right: {gesture}", (300, 110),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 1, cv2.LINE_AA)
     else:
-        # No hands detected: ensure all button keys are released
         release_all_buttons()
 
-    # cv2.namedWindow('Game controler', cv2.WINDOW_NORMAL)
-    # cv2.setWindowProperty('Game controler', cv2.WND_PROP_TOPMOST, 1)
     cv2.imshow('Game controler', frame)
 
     key = cv2.waitKey(1) & 0xFF
-    if key in (ord('q'), ord('Q'), 27):
+    if key in (ord('q'), ord('Q')) and key != 81:
         print("Exiting...")
         break
 

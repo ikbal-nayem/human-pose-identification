@@ -46,9 +46,6 @@ def release_all_buttons():
     # Release both left/right keys (matches on_fist handlers which use label.lower())
     try:
         keyboard.release('left')
-    except Exception:
-        pass
-    try:
         keyboard.release('right')
     except Exception:
         pass
