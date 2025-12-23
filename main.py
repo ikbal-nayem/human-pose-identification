@@ -29,6 +29,11 @@ prev_nose_y = None
 is_jumping = False
 
 cap = cv2.VideoCapture(0)
+# Preview window size (adjust as needed)
+DISPLAY_WIDTH = 640
+DISPLAY_HEIGHT = 480
+cv2.namedWindow('Game controler', cv2.WINDOW_NORMAL)
+cv2.resizeWindow('Game controler', DISPLAY_WIDTH, DISPLAY_HEIGHT)
 
 while cap.isOpened():
     ret, frame = cap.read()
@@ -139,7 +144,12 @@ while cap.isOpened():
     else:
         release_all_buttons()
 
-    cv2.imshow('Game controler', frame)
+    # Resize for preview window so the display is smaller than the processing frame
+    try:
+        display_frame = cv2.resize(frame, (DISPLAY_WIDTH, DISPLAY_HEIGHT))
+    except Exception:
+        display_frame = frame
+    cv2.imshow('Game controler', display_frame)
 
     key = cv2.waitKey(1) & 0xFF
     if key in (ord('q'), ord('Q')) and key != 81:
