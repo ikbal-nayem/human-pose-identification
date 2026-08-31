@@ -8,4 +8,5 @@ dependencies = [
     "keyboard>=0.13.5",
     "mediapipe>=0.10.21",
     "opencv-python>=4.11.0.86",
+    "PySide6>=6.7.0",
 ]

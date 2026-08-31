@@ -1,2 +1,4 @@
 opencv-python
 mediapipe
+keyboard
+PySide6

@@ -1,0 +1,128 @@
+[
+  {
+    "id": "both_hands_up",
+    "name": "Both Hands Up",
+    "category": "Hands",
+    "trigger": "level",
+    "description": "Both wrists raised above head height."
+  },
+  {
+    "id": "left_hand_up",
+    "name": "Left Hand Up",
+    "category": "Hands",
+    "trigger": "level",
+    "description": "Left wrist raised above head height."
+  },
+  {
+    "id": "right_hand_up",
+    "name": "Right Hand Up",
+    "category": "Hands",
+    "trigger": "level",
+    "description": "Right wrist raised above head height."
+  },
+  {
+    "id": "hands_down",
+    "name": "Hands Down",
+    "category": "Hands",
+    "trigger": "level",
+    "description": "Both hands resting below head height."
+  },
+  {
+    "id": "t_pose",
+    "name": "T-Pose",
+    "category": "Pose",
+    "trigger": "level",
+    "description": "Arms stretched out horizontally at shoulder height."
+  },
+  {
+    "id": "arms_crossed",
+    "name": "Arms Crossed",
+    "category": "Pose",
+    "trigger": "level",
+    "description": "Wrists crossed in front of the chest."
+  },
+  {
+    "id": "lean_left",
+    "name": "Lean Left",
+    "category": "Pose",
+    "trigger": "level",
+    "description": "Upper body leaning to the left."
+  },
+  {
+    "id": "lean_right",
+    "name": "Lean Right",
+    "category": "Pose",
+    "trigger": "level",
+    "description": "Upper body leaning to the right."
+  },
+  {
+    "id": "squat",
+    "name": "Squat / Crouch",
+    "category": "Pose",
+    "trigger": "level",
+    "description": "Hips lowered close to knee height."
+  },
+  {
+    "id": "sit_down",
+    "name": "Sit Down",
+    "category": "Motion",
+    "trigger": "edge",
+    "description": "Transition from standing to a lowered posture."
+  },
+  {
+    "id": "stand_up",
+    "name": "Stand Up",
+    "category": "Motion",
+    "trigger": "edge",
+    "description": "Transition from a lowered posture back to standing."
+  },
+  {
+    "id": "jump",
+    "name": "Jump",
+    "category": "Motion",
+    "trigger": "edge",
+    "description": "A quick upward-then-downward head movement."
+  },
+  {
+    "id": "wave_left_hand",
+    "name": "Wave Left Hand",
+    "category": "Motion",
+    "trigger": "edge",
+    "description": "Left hand raised and waved side to side."
+  },
+  {
+    "id": "wave_right_hand",
+    "name": "Wave Right Hand",
+    "category": "Motion",
+    "trigger": "edge",
+    "description": "Right hand raised and waved side to side."
+  },
+  {
+    "id": "left_fist_closed",
+    "name": "Left Fist Closed",
+    "category": "Hands",
+    "trigger": "level",
+    "description": "Left hand closed into a fist."
+  },
+  {
+    "id": "left_fist_open",
+    "name": "Left Fist Open",
+    "category": "Hands",
+    "trigger": "level",
+    "description": "Left hand open with fingers extended."
+  },
+  {
+    "id": "right_fist_closed",
+    "name": "Right Fist Closed",
+    "category": "Hands",
+    "trigger": "level",
+    "description": "Right hand closed into a fist."
+  },
+  {
+    "id": "right_fist_open",
+    "name": "Right Fist Open",
+    "category": "Hands",
+    "trigger": "level",
+    "description": "Right hand open with fingers extended."
+  }
+]
