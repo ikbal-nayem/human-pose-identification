@@ -1,5 +1,5 @@
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QPixmap
+from PySide6.QtGui import QColor, QPixmap
 from PySide6.QtWidgets import (
     QComboBox,
     QFrame,
@@ -79,28 +79,18 @@ class RunPage(QWidget):
         side_panel.setSpacing(16)
         body.addLayout(side_panel, 2)
 
-        active_card = QFrame()
-        active_card.setObjectName("card")
-        active_layout = QVBoxLayout(active_card)
-        active_layout.setContentsMargins(16, 16, 16, 16)
-        active_title = QLabel("ACTIVE ACTIVITIES")
-        active_title.setObjectName("sectionLabel")
-        active_layout.addWidget(active_title)
-        self.active_label = QLabel("None detected yet")
-        self.active_label.setWordWrap(True)
-        active_layout.addWidget(self.active_label)
-        side_panel.addWidget(active_card)
-
         mapped_card = QFrame()
         mapped_card.setObjectName("card")
         mapped_layout = QVBoxLayout(mapped_card)
         mapped_layout.setContentsMargins(16, 16, 16, 16)
-        mapped_title = QLabel("MAPPED KEYS")
+        mapped_title = QLabel("ACTIVITIES")
         mapped_title.setObjectName("sectionLabel")
         mapped_layout.addWidget(mapped_title)
         self.mapped_keys_list = QListWidget()
         mapped_layout.addWidget(self.mapped_keys_list, 1)
         side_panel.addWidget(mapped_card, 1)
+
+        self._activity_items: dict[str, QListWidgetItem] = {}
 
         self.config_combo.currentIndexChanged.connect(self._update_mapped_keys)
 
@@ -138,6 +128,7 @@ class RunPage(QWidget):
 
     def _update_mapped_keys(self):
         self.mapped_keys_list.clear()
+        self._activity_items = {}
         config_id = self.config_combo.currentData()
         if config_id is None:
             return
@@ -148,7 +139,9 @@ class RunPage(QWidget):
         for activity_id, key in mappings.items():
             activity = ACTIVITIES_BY_ID.get(activity_id)
             name = activity.name if activity else activity_id
-            self.mapped_keys_list.addItem(QListWidgetItem(f"{name}  →  {key}"))
+            item = QListWidgetItem(f"{name}  →  {key}")
+            self.mapped_keys_list.addItem(item)
+            self._activity_items[name] = item
 
     # ---- start/stop ----------------------------------------------------------
     def _toggle_tracking(self):
@@ -196,7 +189,8 @@ class RunPage(QWidget):
         self.start_button.setObjectName("startButton")
         self._refresh_style(self.start_button)
         self.status_label.setText("Idle")
-        self.active_label.setText("None detected yet")
+        for item in self._activity_items.values():
+            self._set_item_active(item, False)
         self.video_label.setText("Camera preview will appear here")
         self.video_label.setPixmap(QPixmap())
         self._update_start_enabled()
@@ -205,6 +199,15 @@ class RunPage(QWidget):
     def _refresh_style(widget):
         widget.style().unpolish(widget)
         widget.style().polish(widget)
+
+    @staticmethod
+    def _set_item_active(item: QListWidgetItem, active: bool):
+        if active:
+            item.setBackground(QColor("#2f6b52"))
+            item.setForeground(QColor("#7dffc0"))
+        else:
+            item.setData(Qt.ItemDataRole.BackgroundRole, None)
+            item.setData(Qt.ItemDataRole.ForegroundRole, None)
 
     # ---- worker signal handlers -------------------------------------------
     def _on_frame(self, qimg):
@@ -217,7 +220,9 @@ class RunPage(QWidget):
             self.status_label.setText("Tracking")
 
     def _on_status(self, names: list[str]):
-        self.active_label.setText(", ".join(names) if names else "None detected")
+        active = set(names)
+        for name, item in self._activity_items.items():
+            self._set_item_active(item, name in active)
 
     def _on_error(self, message: str):
         QMessageBox.critical(self, "Camera error", message)
