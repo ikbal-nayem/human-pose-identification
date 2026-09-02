@@ -25,12 +25,6 @@ QLabel#appTitle {
     padding: 22px 18px 4px 18px;
 }
 
-QLabel#appSubtitle {
-    color: #767c92;
-    font-size: 11px;
-    padding: 0px 18px 18px 18px;
-}
-
 QPushButton#navButton {
     text-align: left;
     padding: 12px 18px;

@@ -1,4 +1,7 @@
+from pathlib import Path
+
 from PySide6.QtCore import Qt
+from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
@@ -18,6 +21,8 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("MotionKey")
+        icon_path = Path(__file__).resolve().parent / "assets" / "icon.ico"
+        self.setWindowIcon(QIcon(str(icon_path)))
         self.db = ConfigDatabase()
 
         root = QWidget()
@@ -46,12 +51,9 @@ class MainWindow(QMainWindow):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
 
-        title = QLabel("Motion")
+        title = QLabel("Motion Key")
         title.setObjectName("appTitle")
-        subtitle = QLabel("KEY")
-        subtitle.setObjectName("appSubtitle")
         layout.addWidget(title)
-        layout.addWidget(subtitle)
 
         self.nav_buttons: list[QPushButton] = []
         nav_items = [("▶  Run", 0), ("⚙  Configurations", 1)]
