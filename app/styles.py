@@ -174,8 +174,9 @@ QPushButton#clearKey {
     background: transparent;
     border: none;
     color: #6b7086;
-    padding: 4px 6px;
-    font-size: 12px;
+    padding: 4px;
+    font-size: 13px;
+    font-weight: bold;
 }
 
 QPushButton#clearKey:hover {
@@ -256,15 +257,6 @@ QTableWidget::item {
     padding: 4px;
 }
 
-QTextEdit#logPanel {
-    background-color: #14151b;
-    border: 1px solid #2a2c3a;
-    border-radius: 10px;
-    color: #9aa0b8;
-    font-family: Consolas, monospace;
-    font-size: 11px;
-    padding: 8px;
-}
 
 QLabel#videoLabel {
     background-color: #000000;

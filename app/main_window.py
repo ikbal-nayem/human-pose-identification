@@ -17,7 +17,7 @@ from app.run_page import RunPage
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Motion Control Studio")
+        self.setWindowTitle("MotionKey")
         self.db = ConfigDatabase()
 
         root = QWidget()
@@ -46,9 +46,9 @@ class MainWindow(QMainWindow):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
 
-        title = QLabel("Motion Control")
+        title = QLabel("Motion")
         title.setObjectName("appTitle")
-        subtitle = QLabel("STUDIO")
+        subtitle = QLabel("KEY")
         subtitle.setObjectName("appSubtitle")
         layout.addWidget(title)
         layout.addWidget(subtitle)

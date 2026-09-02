@@ -8,7 +8,7 @@ from app.styles import STYLE_SHEET
 
 def main():
     app = QApplication(sys.argv)
-    app.setApplicationName("Motion Control Studio")
+    app.setApplicationName("MotionKey")
     app.setStyleSheet(STYLE_SHEET)
 
     window = MainWindow()

@@ -5,13 +5,15 @@ from PySide6.QtWidgets import (
     QFrame,
     QHBoxLayout,
     QLabel,
+    QListWidget,
+    QListWidgetItem,
     QMessageBox,
     QPushButton,
-    QTextEdit,
     QVBoxLayout,
     QWidget,
 )
 
+from core.activities import ACTIVITIES_BY_ID
 from core.camera_worker import CameraWorker
 from db.database import ConfigDatabase
 
@@ -89,18 +91,18 @@ class RunPage(QWidget):
         active_layout.addWidget(self.active_label)
         side_panel.addWidget(active_card)
 
-        log_card = QFrame()
-        log_card.setObjectName("card")
-        log_layout = QVBoxLayout(log_card)
-        log_layout.setContentsMargins(16, 16, 16, 16)
-        log_title = QLabel("KEY EVENT LOG")
-        log_title.setObjectName("sectionLabel")
-        log_layout.addWidget(log_title)
-        self.log_view = QTextEdit()
-        self.log_view.setObjectName("logPanel")
-        self.log_view.setReadOnly(True)
-        log_layout.addWidget(self.log_view, 1)
-        side_panel.addWidget(log_card, 1)
+        mapped_card = QFrame()
+        mapped_card.setObjectName("card")
+        mapped_layout = QVBoxLayout(mapped_card)
+        mapped_layout.setContentsMargins(16, 16, 16, 16)
+        mapped_title = QLabel("MAPPED KEYS")
+        mapped_title.setObjectName("sectionLabel")
+        mapped_layout.addWidget(mapped_title)
+        self.mapped_keys_list = QListWidget()
+        mapped_layout.addWidget(self.mapped_keys_list, 1)
+        side_panel.addWidget(mapped_card, 1)
+
+        self.config_combo.currentIndexChanged.connect(self._update_mapped_keys)
 
         self.refresh_configs()
 
@@ -119,6 +121,7 @@ class RunPage(QWidget):
                 self.config_combo.setCurrentIndex(idx)
         self.config_combo.blockSignals(False)
         self._update_start_enabled()
+        self._update_mapped_keys()
 
     def showEvent(self, event):
         super().showEvent(event)
@@ -132,6 +135,20 @@ class RunPage(QWidget):
             self.start_button.setText("No configurations available")
         elif self.worker is None:
             self.start_button.setText("▶  Start Tracking")
+
+    def _update_mapped_keys(self):
+        self.mapped_keys_list.clear()
+        config_id = self.config_combo.currentData()
+        if config_id is None:
+            return
+        mappings = self.db.get_mappings(config_id)
+        if not mappings:
+            self.mapped_keys_list.addItem(QListWidgetItem("No keys mapped in this configuration"))
+            return
+        for activity_id, key in mappings.items():
+            activity = ACTIVITIES_BY_ID.get(activity_id)
+            name = activity.name if activity else activity_id
+            self.mapped_keys_list.addItem(QListWidgetItem(f"{name}  →  {key}"))
 
     # ---- start/stop ----------------------------------------------------------
     def _toggle_tracking(self):
@@ -154,7 +171,6 @@ class RunPage(QWidget):
             if reply != QMessageBox.StandardButton.Yes:
                 return
 
-        self.log_view.clear()
         self.config_combo.setEnabled(False)
         self.start_button.setText("⏹  Stop Tracking")
         self.start_button.setObjectName("stopButton")
@@ -164,7 +180,6 @@ class RunPage(QWidget):
         self.worker = CameraWorker(mappings)
         self.worker.frame_ready.connect(self._on_frame)
         self.worker.status_changed.connect(self._on_status)
-        self.worker.log_message.connect(self._on_log)
         self.worker.error.connect(self._on_error)
         self.worker.finished.connect(self._on_worker_finished)
         self.worker.start()
@@ -203,9 +218,6 @@ class RunPage(QWidget):
 
     def _on_status(self, names: list[str]):
         self.active_label.setText(", ".join(names) if names else "None detected")
-
-    def _on_log(self, message: str):
-        self.log_view.append(message)
 
     def _on_error(self, message: str):
         QMessageBox.critical(self, "Camera error", message)

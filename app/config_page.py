@@ -125,8 +125,10 @@ class ConfigurationsPage(QWidget):
             self._key_buttons[activity.id] = key_btn
             self.table.setCellWidget(row, 3, key_btn)
 
-            clear_btn = QPushButton("Clear")
+            clear_btn = QPushButton("✕")
             clear_btn.setObjectName("clearKey")
+            clear_btn.setToolTip("Clear key")
+            clear_btn.setFixedWidth(28)
             clear_btn.clicked.connect(lambda _, aid=activity.id: self._on_key_cleared(aid))
             self.table.setCellWidget(row, 4, clear_btn)
 
