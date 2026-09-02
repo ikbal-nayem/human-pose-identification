@@ -63,6 +63,13 @@
     "description": "Hips lowered close to knee height."
   },
   {
+    "id": "head_down",
+    "name": "Head Down",
+    "category": "Pose",
+    "trigger": "level",
+    "description": "Head lowered or bowed down toward the chest."
+  },
+  {
     "id": "sit_down",
     "name": "Sit Down",
     "category": "Motion",

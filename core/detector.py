@@ -45,6 +45,7 @@ class ActivityDetector:
     POSTURE_COOLDOWN = 0.8
     SQUAT_ENTER_RATIO = 0.32
     SQUAT_EXIT_RATIO = 0.42
+    HEAD_DOWN_RATIO = 0.15
 
     def __init__(self):
         self._prev_nose_y = None
@@ -154,6 +155,10 @@ class ActivityDetector:
             active.add("lean_left")
         elif lean > 0.35:
             active.add("lean_right")
+
+        head_drop = (mid_sh_y - m["nose"][1]) / m["shoulder_width"]
+        if head_drop < self.HEAD_DOWN_RATIO:
+            active.add("head_down")
 
         return active
 
