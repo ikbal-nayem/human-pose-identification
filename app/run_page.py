@@ -203,8 +203,8 @@ class RunPage(QWidget):
     @staticmethod
     def _set_item_active(item: QListWidgetItem, active: bool):
         if active:
-            item.setBackground(QColor("#2f6b52"))
-            item.setForeground(QColor("#7dffc0"))
+            item.setBackground(QColor("#204536"))
+            item.setForeground(QColor("#7bd9ad"))
         else:
             item.setData(Qt.ItemDataRole.BackgroundRole, None)
             item.setData(Qt.ItemDataRole.ForegroundRole, None)

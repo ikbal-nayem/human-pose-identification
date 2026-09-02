@@ -56,6 +56,9 @@ class KeyCaptureButton(QPushButton):
     def set_key(self, key: str | None):
         self._key = key or ""
         self.setText(self._key.upper() if self._key else "Set key")
+        self.setProperty("hasKey", bool(self._key))
+        self.style().unpolish(self)
+        self.style().polish(self)
 
     def key(self) -> str:
         return self._key
