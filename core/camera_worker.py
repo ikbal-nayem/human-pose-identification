@@ -56,21 +56,11 @@ class CameraWorker(QThread):
     def run(self):
         mapped = known(self.mappings)
         config = EngineConfig(
-            # Latency matters more than the last few percent of landmark
-            # precision when the output is a keypress.
             preset="fast",
             deliver_frames=True,
             enable_hands=needs_hand_model(mapped),
             tuning=Tuning(
                 vertical_swipes=any(i in self.mappings for i in _VERTICAL_SWIPES),
-                # The SDK's own defaults (min_on=0.06, min_off=0.10) favour
-                # chatter-rejection over reaction time, which is right for a
-                # hands-free UI but measures out to ~120ms of dead time before a
-                # held pose reaches its mapped key -- clearly perceptible, and
-                # the previous, pre-SDK version of this app had no debounce at
-                # all. Pressing on the very first qualifying frame recovers
-                # that; releasing keeps a little dwell so a pose hovering right
-                # at the threshold does not chatter the key.
                 level_min_on=0.0,
                 level_min_off=0.03,
                 posture_min_on=0.0,
