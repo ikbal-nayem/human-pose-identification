@@ -1,27 +1,40 @@
-import json
-import os
-from dataclasses import dataclass
+"""The activity catalog, sourced from the motionsense SDK.
 
-ACTIVITIES_PATH = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "activities.json"
-)
+The catalog lives in the SDK so that the definitions the UI shows and the
+definitions the recognizers implement cannot drift apart -- there is one list,
+and it is the one the detector actually uses.
 
+``Activity`` is the SDK's ``ActivityDef``. Its ``trigger`` is a ``str`` enum, so
+comparisons like ``activity.trigger == "level"`` work as they always did.
+"""
 
-@dataclass(frozen=True)
-class Activity:
-    id: str
-    name: str
-    category: str
-    trigger: str  # "level" -> hold key while active, "edge" -> tap key once
-    description: str
+from motionsense import ActivityDef as Activity
+from motionsense import Signal, catalog
 
+__all__ = ["ACTIVITIES", "ACTIVITIES_BY_ID", "Activity", "known", "needs_hand_model"]
 
-def load_activities(path: str = ACTIVITIES_PATH) -> list[Activity]:
-    with open(path, "r", encoding="utf-8") as f:
-        raw = json.load(f)
-    return [Activity(**item) for item in raw]
-
-
-ACTIVITIES: list[Activity] = load_activities()
+#: Ordered for display: the SDK returns them grouped by category already.
+ACTIVITIES: list[Activity] = list(catalog.all_activities())
 ACTIVITIES_BY_ID: dict[str, Activity] = {a.id: a for a in ACTIVITIES}
-CATEGORIES: list[str] = sorted({a.category for a in ACTIVITIES})
+
+
+def needs_hand_model(activity_ids) -> bool:
+    """Whether any of these activities requires the hand-landmark model.
+
+    The hand model costs roughly as much per frame as the pose model, so the app
+    only turns it on when a finger activity is actually mapped to a key.
+    """
+    return any(
+        Signal.HANDS in definition.requires
+        for definition in (ACTIVITIES_BY_ID.get(i) for i in activity_ids)
+        if definition is not None
+    )
+
+
+def known(activity_ids) -> list[str]:
+    """Filter out ids the catalog no longer defines.
+
+    A saved configuration can outlive an activity id. Dropping unknown ids keeps
+    an old configuration loadable instead of failing the whole run.
+    """
+    return [i for i in activity_ids if i in ACTIVITIES_BY_ID]

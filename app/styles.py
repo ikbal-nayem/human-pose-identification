@@ -319,13 +319,22 @@ QLabel#videoLabel {
 }
 
 QLabel#activityChip {
-    background-color: #204536;
-    border: 1px solid #2f6b52;
     border-radius: 12px;
     padding: 4px 12px;
-    color: #7bd9ad;
     font-size: 11px;
     font-weight: 600;
+}
+
+QLabel#activityChip[bound="true"] {
+    background-color: #204536;
+    border: 1px solid #2f6b52;
+    color: #7bd9ad;
+}
+
+QLabel#activityChip[bound="false"] {
+    background-color: #262838;
+    border: 1px solid #3b3e58;
+    color: #969cb4;
 }
 
 QLabel#statusBadge {

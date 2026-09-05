@@ -50,6 +50,15 @@ class RunPage(QWidget):
         self.status_label.setObjectName("statusBadge")
         controls_layout.addWidget(self.status_label)
 
+        self.calibrate_button = QPushButton("Calibrate")
+        self.calibrate_button.setToolTip(
+            "Stand still facing the camera for two seconds.\n"
+            "Tunes posture thresholds to your body and camera angle."
+        )
+        self.calibrate_button.setEnabled(False)
+        self.calibrate_button.clicked.connect(self._calibrate)
+        controls_layout.addWidget(self.calibrate_button)
+
         self.start_button = QPushButton("▶  Start Tracking")
         self.start_button.setObjectName("startButton")
         self.start_button.clicked.connect(self._toggle_tracking)
@@ -133,8 +142,10 @@ class RunPage(QWidget):
             text = f"{name}  →  {key}" if key else name
             chip = QLabel(text)
             chip.setObjectName("activityChip")
+            chip.setProperty("bound", bool(key))
             self.chips_layout.insertWidget(self.chips_layout.count() - 2, chip)
             self._chip_labels.append(chip)
+            self._refresh_style(chip)
 
     # ---- start/stop ----------------------------------------------------------
     def _toggle_tracking(self):
@@ -170,17 +181,25 @@ class RunPage(QWidget):
         self.worker = CameraWorker(mappings)
         self.worker.frame_ready.connect(self._on_frame)
         self.worker.status_changed.connect(self._on_status)
+        self.worker.stats_changed.connect(self._on_stats)
         self.worker.error.connect(self._on_error)
         self.worker.finished.connect(self._on_worker_finished)
         self.worker.start()
+        self.calibrate_button.setEnabled(True)
 
     def _stop_tracking(self):
         if self.worker is not None:
             self.worker.stop()
             self.status_label.setText("Stopping…")
 
+    def _calibrate(self):
+        if self.worker is not None:
+            self.worker.calibrate(2.0)
+            self.status_label.setText("Calibrating…")
+
     def _on_worker_finished(self):
         self.worker = None
+        self.calibrate_button.setEnabled(False)
         self.config_combo.setEnabled(True)
         self.start_button.setText("▶  Start Tracking")
         self.start_button.setObjectName("startButton")
@@ -203,8 +222,9 @@ class RunPage(QWidget):
             self.video_label.size(), Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation
         )
         self.video_label.setPixmap(scaled)
-        if self.status_label.text() != "Tracking":
-            self.status_label.setText("Tracking")
+
+    def _on_stats(self, fps: float, latency_ms: float):
+        self.status_label.setText(f"Tracking  ·  {fps:.0f} fps  ·  {latency_ms:.0f} ms")
 
     def _on_status(self, names: list[str]):
         self._set_detected(names)
