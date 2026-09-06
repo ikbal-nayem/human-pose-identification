@@ -47,6 +47,13 @@ class ConfigDatabase:
                 key TEXT NOT NULL,
                 UNIQUE(config_id, activity_id)
             );
+
+            -- Application preferences, as opposed to the per-configuration key
+            -- mappings above. These follow the app, not the profile in use.
+            CREATE TABLE IF NOT EXISTS settings (
+                key TEXT PRIMARY KEY,
+                value TEXT NOT NULL
+            );
             """
         )
         self.conn.commit()
@@ -130,6 +137,36 @@ class ConfigDatabase:
         )
         self.conn.execute(
             "UPDATE configurations SET updated_at = ? WHERE id = ?", (_now(), config_id)
+        )
+        self.conn.commit()
+
+    # ---- settings ------------------------------------------------------------
+    def get_setting(self, key: str, default: str | None = None) -> str | None:
+        cur = self.conn.execute("SELECT value FROM settings WHERE key = ?", (key,))
+        row = cur.fetchone()
+        return row["value"] if row is not None else default
+
+    def get_int_setting(self, key: str, default: int) -> int:
+        """Integer setting, falling back to ``default`` if unset or unparseable.
+
+        A stored value can outlive the code that wrote it, so a bad one has to
+        degrade to the default rather than stop the app from starting.
+        """
+        raw = self.get_setting(key)
+        if raw is None:
+            return default
+        try:
+            return int(raw)
+        except (TypeError, ValueError):
+            return default
+
+    def set_setting(self, key: str, value) -> None:
+        self.conn.execute(
+            """
+            INSERT INTO settings (key, value) VALUES (?, ?)
+            ON CONFLICT(key) DO UPDATE SET value = excluded.value
+            """,
+            (key, str(value)),
         )
         self.conn.commit()
 

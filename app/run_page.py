@@ -15,6 +15,18 @@ from core.activities import ACTIVITIES_BY_ID
 from core.camera_worker import CameraWorker
 from db.database import ConfigDatabase
 
+#: How often the preview is redrawn, as (label, every-Nth-frame). Drawing the
+#: overlay costs time on the same thread that detects, so this trades preview
+#: smoothness for frame budget -- worth having on hardware where inference
+#: alone already fills the budget.
+PREVIEW_RATES = (
+    ("Every frame", 1),
+    ("Every 2nd frame", 2),
+    ("Every 3rd frame", 3),
+    ("Every 5th frame", 5),
+)
+PREVIEW_SETTING = "preview_interval"
+
 
 class RunPage(QWidget):
     def __init__(self, db: ConfigDatabase, parent=None):
@@ -44,6 +56,24 @@ class RunPage(QWidget):
         self.config_combo.setMinimumWidth(200)
         self.config_combo.currentIndexChanged.connect(self._update_start_enabled)
         controls_layout.addWidget(self.config_combo)
+
+        controls_layout.addWidget(QLabel("Preview:"))
+        self.preview_combo = QComboBox()
+        self.preview_combo.setToolTip(
+            "How often the camera preview is redrawn.\n\n"
+            "Drawing the overlay costs time on the same thread that detects, so\n"
+            "redrawing less often leaves more of the frame budget for detection.\n"
+            "Detection, key presses and the detected list are unaffected — only\n"
+            "the picture updates less often. Takes effect immediately."
+        )
+        for label, value in PREVIEW_RATES:
+            self.preview_combo.addItem(label, value)
+        saved = self.db.get_int_setting(PREVIEW_SETTING, 1)
+        index = self.preview_combo.findData(saved)
+        self.preview_combo.setCurrentIndex(index if index >= 0 else 0)
+        self.preview_combo.currentIndexChanged.connect(self._on_preview_rate_changed)
+        controls_layout.addWidget(self.preview_combo)
+
         controls_layout.addStretch(1)
 
         self.status_label = QLabel("Idle")
@@ -178,7 +208,7 @@ class RunPage(QWidget):
         self._refresh_style(self.start_button)
         self.status_label.setText("Starting camera…")
 
-        self.worker = CameraWorker(mappings)
+        self.worker = CameraWorker(mappings, preview_interval=self._preview_interval())
         self.worker.frame_ready.connect(self._on_frame)
         self.worker.status_changed.connect(self._on_status)
         self.worker.stats_changed.connect(self._on_stats)
@@ -191,6 +221,17 @@ class RunPage(QWidget):
         if self.worker is not None:
             self.worker.stop()
             self.status_label.setText("Stopping…")
+
+    def _preview_interval(self) -> int:
+        value = self.preview_combo.currentData()
+        return int(value) if value else 1
+
+    def _on_preview_rate_changed(self):
+        """Persist the choice and, if tracking, apply it without a restart."""
+        interval = self._preview_interval()
+        self.db.set_setting(PREVIEW_SETTING, interval)
+        if self.worker is not None:
+            self.worker.set_preview_interval(interval)
 
     def _calibrate(self):
         if self.worker is not None:

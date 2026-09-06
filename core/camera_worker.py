@@ -29,10 +29,22 @@ class CameraWorker(QThread):
     error = Signal(str)
     stats_changed = Signal(float, float)  # fps, latency in milliseconds
 
-    def __init__(self, mappings: dict[str, str], camera_index: int = 0, parent=None):
+    def __init__(
+        self,
+        mappings: dict[str, str],
+        camera_index: int = 0,
+        preview_interval: int = 1,
+        parent=None,
+    ):
         super().__init__(parent)
         self.mappings = {aid: key for aid, key in mappings.items() if aid in ACTIVITIES_BY_ID}
         self.camera_index = camera_index
+        #: Draw the preview on every Nth frame. Drawing the skeleton costs about
+        #: 0.7 ms on the detection thread -- immaterial next to ~15 ms of
+        #: inference on this machine, but the dial is here for slower hardware,
+        #: where the camera stops being the limit and that cost starts landing
+        #: on reaction time. 2 or 3 is still a smooth-looking preview.
+        self.preview_interval = max(1, int(preview_interval))
         self._engine: MotionEngine | None = None
         self._labels = {a.id: a.name for a in ACTIVITIES_BY_ID.values()}
         self._last_names: list[str] = []
@@ -44,6 +56,19 @@ class CameraWorker(QThread):
         if engine is not None:
             # Releases every held activity first, so no mapped key is left down.
             engine.stop()
+
+    def set_preview_interval(self, interval: int):
+        """Change the preview rate, including while tracking.
+
+        The engine re-reads this every frame, so a change lands on the next one
+        with no restart. Rebinding an int is atomic under the GIL, so the
+        detection thread cannot catch a half-written value -- the worst case is
+        one frame still drawn at the old rate.
+        """
+        self.preview_interval = max(1, int(interval))
+        engine = self._engine
+        if engine is not None:
+            engine.config.preview_interval = self.preview_interval
 
     def calibrate(self, seconds: float = 2.0):
         """Record the subject's neutral pose so thresholds fit this person."""
@@ -58,6 +83,7 @@ class CameraWorker(QThread):
         config = EngineConfig(
             preset="fast",
             deliver_frames=True,
+            preview_interval=self.preview_interval,
             enable_hands=needs_hand_model(mapped),
             tuning=Tuning(
                 vertical_swipes=any(i in self.mappings for i in _VERTICAL_SWIPES),
